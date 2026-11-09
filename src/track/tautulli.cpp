@@ -202,10 +202,25 @@ void TautulliClient::poll() {
       return;
     }
 
-    const auto data = json->object().value("data").toObject();
+    // Tautulli wraps responses in a "response" object, with the legacy
+    // top-level layout as a fallback.
+    auto envelope = json->object().value("response").toObject();
+    if (envelope.isEmpty()) {
+      envelope = json->object();
+    }
+
+    const auto result = envelope.value("result").toString();
+
+    if (result == "error") {
+      // E.g. an invalid API key. Treated like connection problems since the
+      // polling loop is not the place to notify the user.
+      return;
+    }
+
+    const auto data = envelope.value("data").toObject();
     const auto sessions = data.value("sessions").toArray();
 
-    if (data.isEmpty() || sessions.isEmpty()) {
+    if (sessions.isEmpty()) {
       reset();
       return;
     }
@@ -274,7 +289,14 @@ void TautulliClient::testConnection(
       return;
     }
 
-    const auto result = json->object().value("result").toString();
+    // Tautulli wraps responses in a "response" object, with the legacy
+    // top-level layout as a fallback.
+    auto envelope = json->object().value("response").toObject();
+    if (envelope.isEmpty()) {
+      envelope = json->object();
+    }
+
+    const auto result = envelope.value("result").toString();
 
     if (result != "success") {
       // Tautulli reports an invalid API key as an "error" result.
@@ -283,7 +305,7 @@ void TautulliClient::testConnection(
     }
 
     const auto sessions =
-        json->object().value("data").toObject().value("sessions").toArray().size();
+        envelope.value("data").toObject().value("sessions").toArray().size();
 
     callback(true,
              u"Connected to Tautulli. %1 active session(s)."_s.arg(sessions).toStdString());
