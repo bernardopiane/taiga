@@ -112,8 +112,9 @@ std::optional<Episode> parseSession(const QJsonObject& session) {
   }
 
   const auto showTitle = session.value("grandparent_title").toString();
-  const auto seasonNumber = session.value("parent_media_index").toInt();
-  const auto episodeNumber = session.value("media_index").toInt();
+  // Tautulli doesn't type-cast these fields, so they may arrive as strings.
+  const auto seasonNumber = session.value("parent_media_index").toVariant().toInt();
+  const auto episodeNumber = session.value("media_index").toVariant().toInt();
 
   if (showTitle.isEmpty() || seasonNumber < 1 || episodeNumber < 1) {
     return std::nullopt;
@@ -212,8 +213,10 @@ void TautulliClient::poll() {
     const auto result = envelope.value("result").toString();
 
     if (result == "error") {
-      // E.g. an invalid API key. Treated like connection problems since the
-      // polling loop is not the place to notify the user.
+      // E.g. an invalid API key. This is a deterministic configuration
+      // problem rather than a transient failure, so treat it like a media
+      // close. A later successful poll re-emits the session as usual.
+      reset();
       return;
     }
 
@@ -259,7 +262,7 @@ bool TautulliClient::hasEpisodeChanged(const Episode& episode) const {
   if (!currentEpisode_) return true;
   if (currentEpisode_->animeId() != episode.animeId()) return true;
 
-  return currentEpisode_->elements(anitomy::ElementKind::Episode) ==
+  return currentEpisode_->elements(anitomy::ElementKind::Episode) !=
          episode.elements(anitomy::ElementKind::Episode);
 }
 
