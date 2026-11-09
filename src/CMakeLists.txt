@@ -125,6 +125,8 @@ target_sources(taiga PRIVATE
 	track/recognition_validate.hpp
 	track/scanner.cpp
 	track/scanner.hpp
+	track/tautulli.cpp
+	track/tautulli.hpp
 	track/update_decision.cpp
 	track/update_decision.hpp
 	track/update_session.cpp

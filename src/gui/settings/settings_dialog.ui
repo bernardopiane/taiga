@@ -665,6 +665,118 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="plexPage">
+          <layout class="QVBoxLayout" name="verticalLayout_14">
+           <item>
+            <widget class="QCheckBox" name="tautulliEnabledCheckBox">
+             <property name="text">
+              <string>Detect media played on Plex (via Tautulli)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tautulliGroupBox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>Tautulli connection</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_15">
+              <item>
+               <layout class="QFormLayout" name="tautulliFormLayout">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="tautulliHostLabel">
+                  <property name="text">
+                   <string>Host:</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>tautulliHostLineEdit</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="tautulliHostLineEdit">
+                  <property name="placeholderText">
+                   <string>http://localhost:8181</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="tautulliApiKeyLabel">
+                  <property name="text">
+                   <string>API key:</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>tautulliApiKeyLineEdit</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="tautulliApiKeyLineEdit">
+                  <property name="echoMode">
+                   <enum>QLineEdit::Password</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="tautulliApiKeyEchoCheckBox">
+                  <property name="text">
+                   <string>Show API key</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="tautulliTestLayout">
+                <item>
+                 <widget class="QPushButton" name="tautulliTestButton">
+                  <property name="text">
+                   <string>Test connection</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="tautulliStatusLabel">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="tautulliHintLabel">
+             <property name="text">
+              <string>The update delay and trigger settings on the Recognition page apply to Plex playback as well.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="plexVerticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="advancedPage">
           <layout class="QVBoxLayout" name="verticalLayout_12">
            <item>

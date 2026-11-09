@@ -97,6 +97,18 @@ std::chrono::milliseconds Settings::mediaDetectionInterval() const {
   return std::chrono::milliseconds{interval};
 }
 
+bool Settings::tautulliEnabled() const {
+  return value("track.tautulli.enabled", false).toBool();
+}
+
+std::string Settings::tautulliHost() const {
+  return value("track.tautulli.host").toString().toStdString();
+}
+
+std::string Settings::tautulliApiKey() const {
+  return value("track.tautulli.apiKey").toString().toStdString();
+}
+
 QNetworkProxy::ProxyType Settings::proxyType() const {
   const auto type = value("network.proxy.type", u"http"_s).toString();
   if (type == u"socks5") return QNetworkProxy::Socks5Proxy;
@@ -196,6 +208,18 @@ void Settings::setLibraryFolders(std::vector<std::string> folders) const {
 
 void Settings::setMediaDetectionInterval(const std::chrono::milliseconds interval) const {
   setValue("track.detection.interval", static_cast<qint64>(interval.count()));
+}
+
+void Settings::setTautulliEnabled(const bool enabled) const {
+  setValue("track.tautulli.enabled", enabled);
+}
+
+void Settings::setTautulliHost(const std::string& host) const {
+  setValue("track.tautulli.host", host);
+}
+
+void Settings::setTautulliApiKey(const std::string& apiKey) const {
+  setValue("track.tautulli.apiKey", apiKey);
 }
 
 void Settings::setProxyType(const QNetworkProxy::ProxyType type) const {

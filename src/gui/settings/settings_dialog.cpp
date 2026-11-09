@@ -24,6 +24,7 @@
 #include "gui/settings/settings_page_application.hpp"
 #include "gui/settings/settings_page_library.hpp"
 #include "gui/settings/settings_page_media_players.hpp"
+#include "gui/settings/settings_page_plex.hpp"
 #include "gui/settings/settings_page_recognition.hpp"
 #include "gui/settings/settings_page_streaming.hpp"
 #include "gui/utils/theme.hpp"
@@ -70,6 +71,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     add_child(item, "Media players", ui_->mediaPlayersPage);
     add_child(item, "Streaming", ui_->streamingPage);
   }
+  add_item("play_arrow", "Plex / Tautulli", ui_->plexPage);
   {
     auto item = add_item("share", "Sharing");
     add_child(item, "Discord");
@@ -111,6 +113,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
       new SettingsPageApplication(ui_, this),
       new SettingsPageLibrary(ui_, this),
       new SettingsPageMediaPlayers(ui_, this),
+      new SettingsPagePlex(ui_, this),
       new SettingsPageRecognition(ui_, this),
       new SettingsPageStreaming(ui_, this),
       // clang-format on

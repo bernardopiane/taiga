@@ -45,6 +45,9 @@ public:
   std::string service() const;
   std::vector<std::string> libraryFolders() const;
   std::chrono::milliseconds mediaDetectionInterval() const;
+  bool tautulliEnabled() const;
+  std::string tautulliHost() const;
+  std::string tautulliApiKey() const;
   QNetworkProxy::ProxyType proxyType() const;
   std::string proxyHost() const;
   int proxyPort() const;
@@ -65,6 +68,9 @@ public:
   void setService(const std::string& service) const;
   void setLibraryFolders(std::vector<std::string> folders) const;
   void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;
+  void setTautulliEnabled(const bool enabled) const;
+  void setTautulliHost(const std::string& host) const;
+  void setTautulliApiKey(const std::string& apiKey) const;
   void setProxyType(const QNetworkProxy::ProxyType type) const;
   void setProxyHost(const std::string& host) const;
   void setProxyPort(const int port) const;

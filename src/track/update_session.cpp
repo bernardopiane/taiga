@@ -24,6 +24,7 @@
 #include "media/anime_list_utils.hpp"
 #include "taiga/settings.hpp"
 #include "track/media.hpp"
+#include "track/tautulli.hpp"
 #include "track/scanner.hpp"
 #include "track/update_decision.hpp"
 
@@ -62,6 +63,8 @@ UpdateSession::UpdateSession(QObject* parent) : QObject(parent) {
 
 void UpdateSession::init() {
   connect(media::detection(), &media::Detection::currentEpisodeChanged, this,
+          &UpdateSession::onEpisodeChanged);
+  connect(tautulli::client(), &tautulli::TautulliClient::currentEpisodeChanged, this,
           &UpdateSession::onEpisodeChanged);
 }
 
@@ -143,7 +146,12 @@ void UpdateSession::onMediaClosed() {
 void UpdateSession::tick() {
   // We count ticks instead of comparing timestamps, so that skipping a tick is enough to pause.
   // Being out of focus is our best guess for the media player not playing.
-  paused_ = pauseWhenUnfocused_ && !media::detection()->isPlayerFocused();
+  // Plex reports its own playback state, which is more reliable than focus.
+  if (tautulli::client()->getCurrentEpisode()) {
+    paused_ = !tautulli::client()->isPlaying();
+  } else {
+    paused_ = pauseWhenUnfocused_ && !media::detection()->isPlayerFocused();
+  }
   if (!paused_) elapsed_ += std::chrono::seconds{1};
   evaluate();
 }
