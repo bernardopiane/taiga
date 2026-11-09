@@ -37,12 +37,12 @@ class TautulliClient final : public QObject {
 public:
   TautulliClient(QObject* parent);
 
-  bool init();
+  void init();
 
   bool isEnabled() const;
   void setEnabled(bool enabled);
 
-  const std::optional<Episode> getCurrentEpisode() const;
+  const std::optional<Episode>& getCurrentEpisode() const;
 
   // Whether the active Plex session is currently playing (not paused).
   bool isPlaying() const;

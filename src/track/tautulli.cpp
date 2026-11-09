@@ -19,16 +19,15 @@
 #include "tautulli.hpp"
 
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QRestAccessManager>
 #include <QRestReply>
 #include <QUrl>
 #include <QUrlQuery>
-#include <algorithm>
 #include <chrono>
 
-#include "base/log.hpp"
 #include "base/string.hpp"
 #include "taiga/config.h"
 #include "taiga/network.hpp"
@@ -43,9 +42,8 @@ TautulliClient::TautulliClient(QObject* parent) : QObject(parent), manager_{taig
   connect(pollTimer_, &QTimer::timeout, this, &TautulliClient::poll);
 }
 
-bool TautulliClient::init() {
+void TautulliClient::init() {
   setPollingEnabled(isEnabled());
-  return true;
 }
 
 bool TautulliClient::isEnabled() const {
@@ -61,7 +59,7 @@ bool TautulliClient::isPlaying() const {
   return playing_;
 }
 
-const std::optional<Episode> TautulliClient::getCurrentEpisode() const {
+const std::optional<Episode>& TautulliClient::getCurrentEpisode() const {
   return currentEpisode_;
 }
 
@@ -101,6 +99,16 @@ QUrl getActivityUrl(const QString& host, const QString& apiKey) {
   url.setQuery(query);
 
   return url;
+}
+
+QJsonObject responseEnvelope(const QJsonDocument& json) {
+  // Tautulli wraps responses in a "response" object, with the legacy
+  // top-level layout as a fallback.
+  const auto envelope = json.object().value("response").toObject();
+  if (!envelope.isEmpty()) {
+    return envelope;
+  }
+  return json.object();
 }
 
 std::optional<Episode> parseSession(const QJsonObject& session) {
@@ -205,10 +213,7 @@ void TautulliClient::poll() {
 
     // Tautulli wraps responses in a "response" object, with the legacy
     // top-level layout as a fallback.
-    auto envelope = json->object().value("response").toObject();
-    if (envelope.isEmpty()) {
-      envelope = json->object();
-    }
+    const auto envelope = responseEnvelope(*json);
 
     const auto result = envelope.value("result").toString();
 
@@ -294,10 +299,7 @@ void TautulliClient::testConnection(
 
     // Tautulli wraps responses in a "response" object, with the legacy
     // top-level layout as a fallback.
-    auto envelope = json->object().value("response").toObject();
-    if (envelope.isEmpty()) {
-      envelope = json->object();
-    }
+    const auto envelope = responseEnvelope(*json);
 
     const auto result = envelope.value("result").toString();
 
