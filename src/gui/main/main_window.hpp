@@ -35,6 +35,7 @@ enum class Status;
 namespace gui {
 
 class HistoryWidget;
+class HomeWidget;
 class LibraryWidget;
 class ListWidget;
 class NavigationWidget;
@@ -55,6 +56,7 @@ public:
 
   NavigationWidget* navigation() const;
   NowPlayingWidget* nowPlaying() const;
+  HomeWidget* homeWidget() const;
   QLineEdit* searchBox() const;
   StatusBarController* statusBarController() const;
   Ui::MainWindow* ui() const;
@@ -91,6 +93,7 @@ private:
   Ui::MainWindow* ui_ = nullptr;
 
   HistoryWidget* m_historyWidget = nullptr;
+  HomeWidget* m_homeWidget = nullptr;
   LibraryWidget* m_libraryWidget = nullptr;
   ListWidget* m_listWidget = nullptr;
   NavigationController* m_navigationController = nullptr;

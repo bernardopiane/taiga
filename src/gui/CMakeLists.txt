@@ -41,6 +41,8 @@ target_sources(taiga-gui PRIVATE
 
 	main/about_dialog.cpp
 	main/about_dialog.hpp
+	main/home_widget.cpp
+	main/home_widget.hpp
 	main/main_window.cpp
 	main/main_window.hpp
 	main/navigation_controller.cpp

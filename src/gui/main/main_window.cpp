@@ -30,6 +30,7 @@
 #include "gui/library/library_widget.hpp"
 #include "gui/list/list_widget.hpp"
 #include "gui/main/about_dialog.hpp"
+#include "gui/main/home_widget.hpp"
 #include "gui/main/navigation_controller.hpp"
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
@@ -91,6 +92,10 @@ NavigationWidget* MainWindow::navigation() const {
 
 NowPlayingWidget* MainWindow::nowPlaying() const {
   return m_nowPlayingWidget;
+}
+
+HomeWidget* MainWindow::homeWidget() const {
+  return m_homeWidget;
 }
 
 QLineEdit* MainWindow::searchBox() const {
@@ -199,6 +204,8 @@ void MainWindow::initPage(MainWindowPage page) {
 
   switch (page) {
     case MainWindowPage::Home:
+      m_homeWidget = new HomeWidget(ui_->homePage);
+      init_page(ui_->homePage, m_homeWidget);
       break;
 
     case MainWindowPage::Search:
