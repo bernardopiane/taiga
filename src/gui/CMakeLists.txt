@@ -53,6 +53,8 @@ target_sources(taiga-gui PRIVATE
 	main/navigation_widget.hpp
 	main/now_playing_widget.cpp
 	main/now_playing_widget.hpp
+	main/show_picker_dialog.cpp
+	main/show_picker_dialog.hpp
 	main/status_bar.cpp
 	main/status_bar.hpp
 	main/status_bar_controller.cpp

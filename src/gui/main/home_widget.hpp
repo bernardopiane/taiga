@@ -49,6 +49,9 @@ private:
 
   std::optional<track::Episode> currentEpisode() const;
 
+  void setCurrentShow();
+  void clearCurrentShow();
+
   void refresh();
   void render();
 
@@ -62,6 +65,8 @@ private:
   ClickableLabel* m_editAction = nullptr;
   ClickableLabel* m_shareAction = nullptr;
   ClickableLabel* m_nextEpisodeAction = nullptr;
+  ClickableLabel* m_setShowAction = nullptr;
+  ClickableLabel* m_clearShowAction = nullptr;
 
   // Alternative titles
   QWidget* m_altTitlesSection = nullptr;
@@ -77,10 +82,15 @@ private:
 
   // States
   QWidget* m_content = nullptr;
+  QWidget* m_placeholder = nullptr;
   QLabel* m_placeholderLabel = nullptr;
 
   std::optional<Anime> m_anime;
   std::optional<track::Episode> m_episode;
+
+  // Manually set show, used when the detection picks the wrong anime.
+  int m_manualAnimeId = 0;
+  int m_manualEpisodeNumber = 0;
 };
 
 }  // namespace gui

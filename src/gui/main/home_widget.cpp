@@ -25,6 +25,7 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QTimer>
 #include <QUrl>
@@ -34,6 +35,7 @@
 #include "gui/common/clickable_label.hpp"
 #include "gui/common/poster_widget.hpp"
 #include "gui/main/main_window.hpp"
+#include "gui/main/show_picker_dialog.hpp"
 #include "gui/main/status_bar_controller.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/utils/format.hpp"
@@ -148,6 +150,20 @@ HomeWidget::HomeWidget(QWidget* parent) : QWidget(parent) {
             });
     actionsLayout->addWidget(m_nextEpisodeAction);
 
+    m_setShowAction = makeAction(tr("Set current show"));
+    connect(m_setShowAction, &ClickableLabel::clicked, this,
+            [this](Qt::MouseButton button) {
+              if (button == Qt::MouseButton::LeftButton) setCurrentShow();
+            });
+    actionsLayout->addWidget(m_setShowAction);
+
+    m_clearShowAction = makeAction(tr("Clear manual selection"));
+    connect(m_clearShowAction, &ClickableLabel::clicked, this,
+            [this](Qt::MouseButton button) {
+              if (button == Qt::MouseButton::LeftButton) clearCurrentShow();
+            });
+    actionsLayout->addWidget(m_clearShowAction);
+
     textLayout->addStretch();
   }
 
@@ -183,10 +199,21 @@ HomeWidget::HomeWidget(QWidget* parent) : QWidget(parent) {
   contentLayout->addStretch();
 
   // Placeholder, shown while nothing is being monitored.
-  m_placeholderLabel = new QLabel(tr("Start playing an episode to see it here."), this);
+  m_placeholder = new QWidget(this);
+  const auto placeholderLayout = new QVBoxLayout(m_placeholder);
+  placeholderLayout->setAlignment(Qt::AlignCenter);
+  placeholderLayout->setSpacing(8);
+
+  m_placeholderLabel = new QLabel(tr("Start playing an episode to see it here."), m_placeholder);
   m_placeholderLabel->setAlignment(Qt::AlignCenter);
   m_placeholderLabel->setForegroundRole(QPalette::PlaceholderText);
-  rootLayout->addWidget(m_placeholderLabel, 1);
+  placeholderLayout->addWidget(m_placeholderLabel);
+
+  auto* setShowButton = new QPushButton(tr("Set current show"), m_placeholder);
+  placeholderLayout->addWidget(setShowButton, 0, Qt::AlignCenter);
+  connect(setShowButton, &QPushButton::clicked, this, &HomeWidget::setCurrentShow);
+
+  rootLayout->addWidget(m_placeholder, 1);
 
   applyPaletteColors();
   refresh();
@@ -251,11 +278,37 @@ void HomeWidget::changeEvent(QEvent* event) {
   QWidget::changeEvent(event);
 }
 
+void HomeWidget::setCurrentShow() {
+  std::vector<Anime> items;
+  items.reserve(anime::db.items().size());
+  for (const auto& item : anime::db.items()) {
+    items.push_back(item);
+  }
+
+  const auto selection = ShowPickerDialog::choose(this, items);
+  if (!selection) return;
+
+  m_manualAnimeId = selection->animeId;
+  m_manualEpisodeNumber = selection->episodeNumber;
+  refresh();
+  showStatusMessage(tr("Current show set manually."));
+}
+
+void HomeWidget::clearCurrentShow() {
+  m_manualAnimeId = 0;
+  m_manualEpisodeNumber = 0;
+  refresh();
+}
+
 void HomeWidget::refresh() {
   m_episode = currentEpisode();
 
   m_anime.reset();
-  if (m_episode) {
+  if (m_manualAnimeId) {
+    if (const auto* item = anime::db.item(m_manualAnimeId)) {
+      m_anime = *item;
+    }
+  } else if (m_episode) {
     if (const auto* item = anime::db.item(m_episode->animeId())) {
       m_anime = *item;
     }
@@ -267,7 +320,7 @@ void HomeWidget::refresh() {
 void HomeWidget::render() {
   const bool idle = !m_anime && !m_episode;
   m_content->setVisible(!idle);
-  m_placeholderLabel->setVisible(idle);
+  m_placeholder->setVisible(idle);
   if (idle) return;
 
   // Title
@@ -292,7 +345,10 @@ void HomeWidget::render() {
 
   // Now playing line
   QString nowPlaying;
-  if (m_episode) {
+  if (m_manualAnimeId) {
+    nowPlaying = tr("Now playing: Episode %1").arg(m_manualEpisodeNumber);
+    nowPlaying += tr(" (manually set)");
+  } else if (m_episode) {
     nowPlaying = u"Now playing: Episode %1"_s.arg(
         formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode)));
     if (m_episode->contains(anitomy::ElementKind::ReleaseGroup)) {
@@ -306,6 +362,9 @@ void HomeWidget::render() {
   for (auto* action : {m_editAction, m_shareAction, m_nextEpisodeAction}) {
     action->setEnabled(m_anime.has_value());
   }
+  m_setShowAction->setEnabled(true);
+  m_clearShowAction->setVisible(m_manualAnimeId != 0);
+  m_clearShowAction->setEnabled(m_manualAnimeId != 0);
 
   // Alternative titles
   QStringList altTitles;
@@ -361,7 +420,8 @@ void HomeWidget::applyPaletteColors() {
   QPalette linkPalette;
   linkPalette.setColor(QPalette::WindowText, linkColor);
   m_titleLabel->setPalette(linkPalette);
-  for (auto* action : {m_editAction, m_shareAction, m_nextEpisodeAction}) {
+  for (auto* action :
+       {m_editAction, m_shareAction, m_nextEpisodeAction, m_setShowAction, m_clearShowAction}) {
     action->setPalette(linkPalette);
     action->setForegroundRole(QPalette::WindowText);
   }
